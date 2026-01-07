@@ -27,7 +27,9 @@ const BookPage = React.forwardRef(function BookPage(props, ref) {
         <div className="coverInner">
           <div className="coverTitle">THỰC ĐƠN</div>
           <div className="coverSub">Tiệc tất niên 2026</div>
-          <div className="coverHint">Kéo góc trang hoặc chạm mép để lật</div>
+          <div className="coverHint">
+            Kéo góc trang hoặc chạm mép để lật
+          </div>
         </div>
       </div>
     );
@@ -121,18 +123,34 @@ export default function HomePage() {
     []
   );
 
+  const totalPages = pages.length + 2; // cover + back cover
+
+  const isMobile =
+    typeof window !== "undefined" && window.innerWidth <= 768;
+
   return (
     <div style={{ width: "100vw", height: "100vh", position: "relative" }}>
-      {/* BACKGROUND */}
-      <img
-        src={background.src}
-        alt="bg"
+      {/* BACKGROUND – GIỮ FULL ẢNH */}
+      <div
         style={{
           width: "100vw",
           height: "100vh",
-          objectFit: "cover",
+          background: "#000",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
-      />
+      >
+        <img
+          src={background.src}
+          alt="bg"
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: isMobile ? "contain" : "contain",
+          }}
+        />
+      </div>
 
       {/* BUTTONS */}
       <a
@@ -172,7 +190,7 @@ export default function HomePage() {
         📖 Thực đơn
       </button>
 
-      {/* MODAL */}
+      {/* MODAL MENU */}
       {showMenu && (
         <div className="menuModal" onClick={() => setShowMenu(false)}>
           <div className="menuBox" onClick={(e) => e.stopPropagation()}>
@@ -180,7 +198,7 @@ export default function HomePage() {
               ✕
             </button>
 
-            {/* Arrow chỉ hiện trên desktop */}
+            {/* Arrow chỉ hiện desktop */}
             {!portrait && (
               <button
                 className="arrow left"
@@ -202,6 +220,11 @@ export default function HomePage() {
                 mobileScrollSupport
                 useMouseEvents
                 clickEventForward
+                onFlip={(e) => {
+                  if (e.data === totalPages - 1) {
+                    setTimeout(() => setShowMenu(false), 600);
+                  }
+                }}
               >
                 <BookPage isCover />
                 {pages.map((p, i) => (
