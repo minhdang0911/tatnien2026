@@ -1,7 +1,4 @@
-import "./menu.css";
-export const metadata = {
-  title: "QR Check-in",
-};
+export const metadata = { title: "QR Check-in" };
 
 export default function RootLayout({ children }) {
   return (
