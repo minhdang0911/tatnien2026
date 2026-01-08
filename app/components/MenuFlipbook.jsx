@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import HTMLFlipBook from "react-pageflip";
+import Image from "next/image";
 import styles from "../menu.module.css";
 
 /* ================= PAGE ================= */
@@ -12,7 +13,16 @@ const BookPage = React.forwardRef(function BookPage(props, ref) {
   if (type === "image") {
     return (
       <div ref={ref} className={`${styles.page} ${styles.pageImage}`}>
-        <img className={styles.pageImg} src={fullImg} alt="" />
+        <div className={styles.pageImgWrap}>
+          <Image
+            src={fullImg}
+            alt=""
+            fill
+            sizes="(max-width: 768px) 92vw, 520px"
+            style={{ objectFit: "cover" }}
+            priority
+          />
+        </div>
       </div>
     );
   }
@@ -31,7 +41,13 @@ const BookPage = React.forwardRef(function BookPage(props, ref) {
 
         <div className={styles.right}>
           <div className={styles.imgWrap}>
-            <img src={img} alt={title} />
+            <Image
+              src={img}
+              alt={title || ""}
+              fill
+              sizes="(max-width: 768px) 60vw, 260px"
+              style={{ objectFit: "cover" }}
+            />
           </div>
         </div>
       </div>
@@ -70,30 +86,37 @@ function useBookSize(open) {
   return size;
 }
 
-/* ================= COMPONENT ================= */
+/* ================= OUTER: keyed remount ================= */
 
-export default function MenuFlipbook({
-  open,
-  onClose,
-  pages,
-  autoCloseLastMs = 3000,
-}) {
+export default function MenuFlipbook(props) {
+  const { open } = props;
+  if (!open) return null;
+
+  // mỗi lần open=true => mount mới => state reset, khỏi setState trong effect
+  return <MenuFlipbookInner key="menu-flipbook-open" {...props} />;
+}
+
+/* ================= INNER ================= */
+
+function MenuFlipbookInner({ open, onClose, pages, autoCloseLastMs = 3000 }) {
   const bookRef = useRef(null);
   const closeTimerRef = useRef(null);
 
   const { pageW, pageH, portrait } = useBookSize(open);
 
-  // mode: single-start | spread | single-end
-  const [mode, setMode] = useState("single-start");
+  const [pageIndex, setPageIndex] = useState(0);
   const totalPages = pages.length;
+  const last = totalPages - 1;
+
+  const mode = useMemo(() => {
+    if (pageIndex === 0) return "single-start";
+    if (pageIndex === last) return "single-end";
+    return "spread";
+  }, [pageIndex, last]);
 
   const handleFlip = (e) => {
     const idx = e.data;
-    const last = totalPages - 1;
-
-    if (idx === 0) setMode("single-start");
-    else if (idx === last) setMode("single-end");
-    else setMode("spread");
+    setPageIndex(idx);
 
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
     if (idx === last && autoCloseLastMs > 0) {
@@ -102,23 +125,20 @@ export default function MenuFlipbook({
   };
 
   useEffect(() => {
-    if (!open) return;
-    setMode("single-start");
-    setTimeout(() => bookRef.current?.pageFlip()?.flip(0), 0);
-  }, [open]);
-
-  useEffect(() => {
     return () => {
       if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
     };
   }, []);
 
-  if (!open) return null;
-
   return (
     <div className={styles.menuModal} onClick={onClose}>
       <div className={styles.menuBox} onClick={(e) => e.stopPropagation()}>
-        <button className={styles.closeBtnPro} onClick={onClose} aria-label="Đóng">
+        <button
+          className={styles.closeBtnPro}
+          onClick={onClose}
+          aria-label="Đóng"
+          type="button"
+        >
           ✕
         </button>
 
@@ -128,6 +148,7 @@ export default function MenuFlipbook({
               className={`${styles.navBtn} ${styles.navLeft}`}
               onClick={() => bookRef.current?.pageFlip()?.flipPrev()}
               aria-label="Previous page"
+              type="button"
             >
               ‹
             </button>
@@ -135,6 +156,7 @@ export default function MenuFlipbook({
               className={`${styles.navBtn} ${styles.navRight}`}
               onClick={() => bookRef.current?.pageFlip()?.flipNext()}
               aria-label="Next page"
+              type="button"
             >
               ›
             </button>
@@ -160,6 +182,7 @@ export default function MenuFlipbook({
             mobileScrollSupport
             useMouseEvents
             clickEventForward
+            startPage={0}
             onFlip={handleFlip}
           >
             {pages.map((p, i) => (

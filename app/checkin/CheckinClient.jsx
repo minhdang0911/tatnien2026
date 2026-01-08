@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import styles from "./CheckinPage.module.css";
 
@@ -15,48 +15,31 @@ import comduongchau from "../assests/menu/comduongchau.webp";
 import cachem from "../assests/menu/cachem.jpg";
 import lauthai from "../assests/menu/lauthai.jpg";
 import raucau from "../assests/menu/raucau.jpg";
+import timeline from "../assests/img/timeline.png";
+
+// icons/images
 import menu from "../assests/img/menu.png";
+import backgroundtet from "../assests/img/tet6.gif";
 
 // covers
 import bia from "../assests/menu/bia.png";
 import thankyou from "../assests/menu/thankyou.png";
 import biaket from "../assests/menu/ketbia.png";
 
-/* ================= TABLE POS (tọa độ highlight) ================= */
+// table backgrounds
+import KA from "../assests/img/KA.jpg";
+import KM from "../assests/img/KM.jpg";
+
+/* ================= TABLE POS (normalized 0..1 theo ảnh) ================= */
 const TABLE_POS = {
-  BGD: { x: "38%", y: "42%" },
-  KM: { x: "52%", y: "42%" },
-  QL: { x: "66%", y: "42%" },
-
-  NV1: { x: "44%", y: "58%" },
-  NV2: { x: "58%", y: "58%" },
-  NV3: { x: "72%", y: "58%" },
-
-  // Nếu có NV4 thì bạn add toạ độ ở đây
-  // NV4: { x: "??%", y: "??%" },
-
-  // Nếu KA/DP có bàn trên map thì bạn add thêm:
-  // KA: { x: "??%", y: "??%" },
-  // DP: { x: "??%", y: "??%" },
+  KM: { x: 0.684, y: 0.2 },
+  KA: { x: 0.808, y: 0.3 },
 };
 
-/* ================= TABLE LABEL (hiển thị chuyên nghiệp) ================= */
+/* ================= TABLE LABEL ================= */
 const TABLE_INFO = {
-  BGD: { label: "Bàn Ban Giám đốc" },
   KM: { label: "Bàn Khách mời" },
   KA: { label: "Bàn Công ty Kiến An" },
-  QL: { label: "Bàn Quản lý" },
-  DP: { label: "Bàn Dự phòng" },
-
-  NV1: { label: "Bàn Nhân viên 1" },
-  NV2: { label: "Bàn Nhân viên 2" },
-  NV3: { label: "Bàn Nhân viên 3" },
-  NV4: { label: "Bàn Nhân viên 4" },
-};
-
-const TITLE_MAP = {
-  anh: "Anh",
-  chi: "Chị",
 };
 
 function safeTrim(s) {
@@ -65,25 +48,27 @@ function safeTrim(s) {
 
 export default function CheckinClient() {
   const sp = useSearchParams();
+  const tableCode = safeTrim(sp.get("table"));
 
-  const rawName = safeTrim(sp.get("name"));
-  const name = rawName || "Quý khách";
-
-  const titleKey = safeTrim(sp.get("title")) || "anh";
-  const honorific = TITLE_MAP[titleKey] || "Quý khách";
-  const honorificOnly =
-    name === "Quý khách" ? "quý khách" : honorific.toLowerCase();
-
-  const tableCode = safeTrim(sp.get("table")); // ví dụ: NV1
-  const tableMeta = tableCode ? TABLE_INFO[tableCode] : null;
-  const tableLabel = tableMeta?.label || "Khu vực đón tiếp";
+  const tableLabel = TABLE_INFO[tableCode]?.label || "";
+  const posNorm = TABLE_POS[tableCode] || null;
 
   const [showMenu, setShowMenu] = useState(false);
+  const [showTimeline, setShowTimeline] = useState(false);
 
-  // highlight theo map (nếu không có tọa độ thì chỉ hiện panel ở giữa dưới)
-  const pos = tableCode ? TABLE_POS[tableCode] : null;
+  // refs để tính object-fit: contain rect
+  const bgWrapRef = useRef(null);
+  const imgRef = useRef(null);
 
-  /* ================= MENU PAGES ================= */
+  // vị trí marker theo px (trong bgWrap)
+  const [markerPx, setMarkerPx] = useState(null);
+
+  const bgSrc = useMemo(() => {
+    if (tableCode === "KM") return KM.src;
+    if (tableCode === "KA") return KA.src;
+    return background.src;
+  }, [tableCode]);
+
   const pages = useMemo(
     () => [
       { type: "image", fullImg: bia.src },
@@ -102,46 +87,180 @@ export default function CheckinClient() {
     []
   );
 
-  // text chào chuyên nghiệp
-  // - Nếu name là "Quý khách" thì không kèm honorific để khỏi "Anh Quý khách"
-  const greetingName =
-    name === "Quý khách" ? "Quý khách" : `${honorific} ${name}`;
+  const timelineItems = useMemo(
+    () => [
+      { time: "18:00", title: "Mời khách", desc: "Đón khách – Check-in" },
+      { time: "18:45", title: "Khai tiệc", desc: "Bắt đầu chương trình" },
+    ],
+    []
+  );
+
+  // tính marker theo "khung ảnh render thực tế" khi object-fit: contain
+  const recomputeMarker = () => {
+    if (!posNorm) {
+      setMarkerPx(null);
+      return;
+    }
+
+    const wrap = bgWrapRef.current;
+    const img = imgRef.current;
+    if (!wrap || !img) return;
+
+    const W = wrap.clientWidth;
+    const H = wrap.clientHeight;
+
+    const nW = img.naturalWidth || 0;
+    const nH = img.naturalHeight || 0;
+    if (!nW || !nH) return;
+
+    const scale = Math.min(W / nW, H / nH);
+    const rW = nW * scale;
+    const rH = nH * scale;
+
+    const offsetX = (W - rW) / 2;
+    const offsetY = (H - rH) / 2;
+
+    const xPx = offsetX + posNorm.x * rW;
+    const yPx = offsetY + posNorm.y * rH;
+
+    setMarkerPx({ x: xPx, y: yPx });
+  };
+
+  useEffect(() => {
+    recomputeMarker();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bgSrc, tableCode]);
+
+  useEffect(() => {
+    const onResize = () => recomputeMarker();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [posNorm, bgSrc]);
+
+  // ESC đóng modal
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === "Escape") setShowTimeline(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   return (
     <div className={styles.root}>
-      {/* BACKGROUND */}
-      <div className={styles.bgWrap}>
-        <img className={styles.bgImg} src={background.src} alt="bg" />
-        <div className={styles.bgOverlay} />
+      {/* BACKGROUND TẾT */}
+      <div className={styles.tetBg}>
+        <img className={styles.tetImg} src={backgroundtet.src} alt="tet" />
       </div>
 
-      {/* HIGHLIGHT + PANEL */}
-      <div
-        className={styles.tableWrap}
-        style={
-          pos ? { left: pos.x, top: pos.y } : { left: "50%", top: "68%" } // fallback vị trí panel nếu không có pos
-        }
-      >
-        {pos && <div className={styles.tableGlow} />}
+      {/* ẢNH CHÍNH */}
+      <div className={styles.bgWrap} ref={bgWrapRef}>
+        <img
+          ref={imgRef}
+          className={styles.bgImg}
+          src={bgSrc}
+          alt="bg"
+          onLoad={recomputeMarker}
+        />
+        <div className={styles.bgOverlay} />
 
-        <div className={styles.tooltip}>
-          <div className={styles.greetTitle}>Kính chào {greetingName}</div>
-          <div className={styles.greetSub}>
-            Bàn của {honorificOnly} là: <b>{tableLabel}</b>
+        {/* HIGHLIGHT */}
+        <div
+          className={styles.tableWrap}
+          style={
+            markerPx
+              ? { left: `${markerPx.x}px`, top: `${markerPx.y}px` }
+              : { left: "50%", top: "68%" }
+          }
+        >
+          {markerPx && <div className={styles.tableGlow} />}
+
+          <div className={styles.tooltip}>
+            <div className={styles.greetTitle}>Đây là vị trí bàn của bạn</div>
+            {tableLabel && (
+              <div className={styles.greetSub}>
+                <b>{tableLabel}</b>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* MENU BUTTON */}
-      <button
-        className={`${styles.btnFloating} ${styles.rightBtn} ${styles.menuGlow}`}
-        onClick={() => setShowMenu(true)}
-      >
-        <img className={styles.menuIcon} src={menu.src} alt="menu" />
-        Thực đơn
-      </button>
+      {/* FLOATING ACTIONS (2 nút) */}
+      <div className={styles.fabWrap}>
+        <button
+          className={`${styles.fabBtn} ${styles.timelineBtn}`}
+          onClick={() => setShowTimeline(true)}
+          aria-label="Mở lịch trình"
+        >
+          <img src={timeline.src} alt="timeline" className={styles.timelineIcon} />
+          Lịch trình
+        </button>
+        
 
-      {/* MENU FLIPBOOK */}
+        <button
+          className={`${styles.fabBtn} ${styles.menuBtn}`}
+          onClick={() => setShowMenu(true)}
+          aria-label="Mở thực đơn"
+        >
+          <span className={styles.menuIconWrap}>
+            <img className={styles.menuIcon} src={menu.src} alt="menu" />
+          </span>
+          Thực đơn
+        </button>
+      </div>
+
+      {/* TIMELINE MODAL (bottom sheet style) */}
+      {showTimeline && (
+        <div
+          className={styles.sheetOverlay}
+          onClick={() => setShowTimeline(false)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className={styles.sheet}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={styles.sheetHeader}>
+              <div>
+                <div className={styles.sheetTitle}>Lịch trình</div>
+                <div className={styles.sheetSub}>
+                  Mời khách <b>18:00</b> · Khai tiệc <b>18:45</b>
+                </div>
+              </div>
+
+              <button
+                className={styles.sheetClose}
+                onClick={() => setShowTimeline(false)}
+                aria-label="Đóng"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className={styles.timelineList}>
+              {timelineItems.map((it, idx) => (
+                <div key={idx} className={styles.tItem}>
+                  <div className={styles.tDot} />
+                  <div className={styles.tBody}>
+                    <div className={styles.tTop}>
+                      <div className={styles.tTime}>{it.time}</div>
+                      <div className={styles.tTitle}>{it.title}</div>
+                    </div>
+                    <div className={styles.tDesc}>{it.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+           
+          </div>
+        </div>
+      )}
+
+      {/* MENU */}
       <MenuFlipbook
         open={showMenu}
         onClose={() => setShowMenu(false)}
