@@ -1,3 +1,4 @@
+import './globals.css';
 export const metadata = { title: "QR Check-in" };
 
 export default function RootLayout({ children }) {

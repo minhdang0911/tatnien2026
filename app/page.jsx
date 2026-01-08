@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./HomePage.module.css";
 
 import background from "./assests/img/anhchinh.jpg";
@@ -14,8 +14,11 @@ import comduongchau from "./assests/menu/comduongchau.webp";
 import cachem from "./assests/menu/cachem.jpg";
 import lauthai from "./assests/menu/lauthai.jpg";
 import raucau from "./assests/menu/raucau.jpg";
+
 import menu from "./assests/img/menu.png";
-import timeline from './assests/img/timeline.png'
+import timeline from "./assests/img/timeline.png";
+import iconsPlay from "./assests/img/play.jpg";
+import iconsPause from "./assests/img/pause.jpg";
 
 // covers
 import bia from "./assests/menu/bia.png";
@@ -27,6 +30,11 @@ import MenuFlipbook from "./components/MenuFlipbook";
 export default function HomePage() {
   const [showMenu, setShowMenu] = useState(false);
   const [showTimeline, setShowTimeline] = useState(false);
+
+  // ===== MUSIC =====
+  const audioRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [showMusicPrompt, setShowMusicPrompt] = useState(false);
 
   const pages = useMemo(
     () => [
@@ -52,6 +60,42 @@ export default function HomePage() {
     []
   );
 
+  const play = async () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    await audio.play();
+    audio.volume = 0.8;
+    setIsPlaying(true);
+    localStorage.setItem("music_playing", "1");
+    setShowMusicPrompt(false);
+  };
+
+  const pause = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.pause();
+    setIsPlaying(false);
+    localStorage.setItem("music_playing", "0");
+    setShowMusicPrompt(false);
+  };
+
+  const toggleMusic = async () => {
+    if (isPlaying) pause();
+    else await play();
+  };
+
+  // popup hỏi nhạc sau 3s
+  useEffect(() => {
+    const saved = localStorage.getItem("music_playing");
+    if (saved === "0") return;
+
+    const t = setTimeout(() => {
+      setShowMusicPrompt(true);
+    }, 3000);
+
+    return () => clearTimeout(t);
+  }, []);
+
   // ESC đóng sheet
   useEffect(() => {
     const onKey = (e) => {
@@ -62,99 +106,95 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className={styles.root}>
-      {/* BACKGROUND TẾT (layer 0) */}
-      <div className={styles.tetBg}>
-        <img className={styles.tetImg} src={backgroundtet.src} alt="tet" />
-      </div>
-
-      {/* ẢNH CHÍNH (layer 1) */}
-      <div className={styles.bgWrap}>
-        <img className={styles.bgImg} src={background.src} alt="bg" />
-        <div className={styles.bgOverlay} />
-      </div>
-
-      LEFT ACTION: tạo QR (giữ như cũ)
-      {/* <a href="/create" className={`${styles.fabBtn} ${styles.createBtn}`}>
-        → Tạo QR
-      </a> */}
-
-      {/* RIGHT ACTIONS (2 nút stack) */}
-      <div className={styles.fabWrap}>
-        <button
-          className={`${styles.fabBtn} ${styles.timelineBtn}`}
-          onClick={() => setShowTimeline(true)}
-          aria-label="Mở lịch trình"
-        >
-        <img src={timeline.src} alt="timeline" className={styles.timelineIcon} />
-          Lịch trình
-        </button>
-
-        <button
-          className={`${styles.fabBtn} ${styles.menuBtn}`}
-          onClick={() => setShowMenu(true)}
-          aria-label="Mở thực đơn"
-        >
-          <span className={styles.menuIconWrap}>
-            <img className={styles.menuIcon} src={menu.src} alt="menu" />
-          </span>
-          Thực đơn
-        </button>
-      </div>
-
-      {/* TIMELINE SHEET */}
-      {showTimeline && (
-        <div
-          className={styles.sheetOverlay}
-          onClick={() => setShowTimeline(false)}
-          role="dialog"
-          aria-modal="true"
-        >
-          <div className={styles.sheet} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.sheetHeader}>
-              <div>
-                <div className={styles.sheetTitle}>Lịch trình</div>
-                <div className={styles.sheetSub}>
-                  Mời khách <b>18:00</b> · Khai tiệc <b>18:45</b>
-                </div>
-              </div>
-
-              <button
-                className={styles.sheetClose}
-                onClick={() => setShowTimeline(false)}
-                aria-label="Đóng"
-              >
-                ✕
+    <>
+      {/* POPUP MUSIC */}
+      {showMusicPrompt && !isPlaying && (
+        <div className={styles.musicOverlay}>
+          <div className={styles.musicPopup}>
+            <div className={styles.musicTitle}>
+              🎵 Bật nhạc xuân để không khí thêm rộn ràng?
+            </div>
+            <div className={styles.musicActions}>
+              <button className={styles.musicYes} onClick={play}>
+                Bật nhạc
+              </button>
+              <button className={styles.musicNo} onClick={pause}>
+                Không
               </button>
             </div>
-
-            <div className={styles.timelineList}>
-              {timelineItems.map((it, idx) => (
-                <div key={idx} className={styles.tItem}>
-                  <div className={styles.tDot} />
-                  <div className={styles.tBody}>
-                    <div className={styles.tTop}>
-                      <div className={styles.tTime}>{it.time}</div>
-                      <div className={styles.tTitle}>{it.title}</div>
-                    </div>
-                    <div className={styles.tDesc}>{it.desc}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className={styles.sheetHint}>Tip: bấm ra ngoài để đóng.</div>
           </div>
         </div>
       )}
 
-      {/* MENU COMPONENT */}
-      <MenuFlipbook
-        open={showMenu}
-        onClose={() => setShowMenu(false)}
-        pages={pages}
-        autoCloseLastMs={3000}
-      />
-    </div>
+      <div className={styles.root}>
+        <div className={styles.tetBg}>
+          <img className={styles.tetImg} src={backgroundtet.src} alt="tet" />
+        </div>
+
+        <audio ref={audioRef} src="/media/music.mp3" loop preload="auto" />
+
+        <div className={styles.bgWrap}>
+          <img className={styles.bgImg} src={background.src} alt="bg" />
+          <div className={styles.bgOverlay} />
+        </div>
+
+
+        {/* RIGHT ACTIONS */}
+        <div className={styles.fabWrap}>
+          {/* MUSIC BUTTON */}
+        
+         <button
+  className={`${styles.musicBtn} ${isPlaying ? styles.musicPlaying : ""}`}
+  onClick={toggleMusic}
+  aria-label="Bật / tắt nhạc"
+>
+
+          <img
+  src={(isPlaying ? iconsPause : iconsPlay).src}
+  alt="music"
+  className={styles.musicIcon}
+/>
+
+          </button>
+
+          <button
+            className={`${styles.fabBtn} ${styles.timelineBtn}`}
+            onClick={() => setShowTimeline(true)}
+          >
+            <img src={timeline.src} className={styles.timelineIcon} />
+            Lịch trình
+          </button>
+
+          <button
+            className={`${styles.fabBtn} ${styles.menuBtn}`}
+            onClick={() => setShowMenu(true)}
+          >
+            <span className={styles.menuIconWrap}>
+              <img className={styles.menuIcon} src={menu.src} />
+            </span>
+            Thực đơn
+          </button>
+        </div>
+
+        {/* TIMELINE */}
+        {showTimeline && (
+          <div
+            className={styles.sheetOverlay}
+            onClick={() => setShowTimeline(false)}
+          >
+            <div className={styles.sheet} onClick={(e) => e.stopPropagation()}>
+              {/* giữ nguyên phần này */}
+            </div>
+          </div>
+        )}
+
+        <MenuFlipbook
+          open={showMenu}
+          onClose={() => setShowMenu(false)}
+          pages={pages}
+          autoCloseLastMs={3000}
+        />
+      </div>
+    </>
   );
 }
