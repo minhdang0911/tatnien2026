@@ -30,8 +30,8 @@ import biaket from "../assests/menu/trangket.png";
 
 /* ================= TABLE POS ================= */
 const TABLE_POS = {
-  KM: { x: 0.6, y: 0.25 },
-  KA: { x: 0.6, y: 0.35 },
+  KM: { x: 0.6, y: 0.345 },
+  KA: { x: 0.6, y: 0.43 },
 };
 
 const TABLE_INFO = {
@@ -180,7 +180,7 @@ export default function CheckinClient() {
         </div>
 
         {/* ✅ TABLE PANEL (CÁI BẠN ĐANG TÌM) */}
-   {posNorm && tableLabel && (
+   {/* {posNorm && tableLabel && (
   <div
     className={styles.tablePanel}
     style={{
@@ -199,7 +199,7 @@ export default function CheckinClient() {
       ) : null}
     </div>
   </div>
-)}
+)} */}
 
 
         {/* FLOAT BUTTONS */}
