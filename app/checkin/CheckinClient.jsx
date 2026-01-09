@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import styles from "./CheckinPage.module.css";
 
-import background from "../assests/img/anh4.png";
+import background from "../assests/img/anhchinh.jpg";
 import backgroundtet from "../assests/img/tet6.gif";
 
 import MenuFlipbook from "../components/MenuFlipbook";
