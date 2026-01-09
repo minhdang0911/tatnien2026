@@ -17,6 +17,7 @@ import comduongchau from "../assests/menu/comduongchau.webp";
 import cachem from "../assests/menu/cachem.jpg";
 import lauthai from "../assests/menu/lauthai.jpg";
 import raucau from "../assests/menu/raucau.jpg";
+import logo from "../assests/img/logo.png";
 
 // icons
 import menu from "../assests/img/menu.png";
@@ -111,6 +112,15 @@ export default function CheckinClient() {
     return () => window.removeEventListener("pointerdown", first);
   }, [isPlaying]);
 
+  /* ESC đóng timeline */
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === "Escape") setShowTimeline(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   /* ===== MENU DATA ===== */
   const pages = useMemo(
     () => [
@@ -128,12 +138,33 @@ export default function CheckinClient() {
     []
   );
 
+  /* ===== EVENT INFO + TIMELINE (đúng theo bạn) ===== */
+  const eventInfo = useMemo(
+    () => ({
+      name: "TIỆC TẤT NIÊN",
+      org: "CÔNG TY CỔ PHẦN CÔNG NGHỆ TIỆN ÍCH THÔNG MINH",
+      time: "18h ngày 27/01/2026",
+      place:
+        "110-112 Đ. Vành Đai Trong, An Lạc A, Bình Tân, Thành phố Hồ Chí Minh",
+    }),
+    []
+  );
+
+  const timelineItems = useMemo(
+    () => [
+      { time: "18g00", title: "Mời khách", desc: "Đón khách – Check-in" },
+      { time: "18g45", title: "Khai tiệc", desc: "Bắt đầu chương trình" },
+      // sau này bạn thêm tiếp ở đây
+    ],
+    []
+  );
+
   const bgSrc =
     tableCode === "KM" ? KM.src : tableCode === "KA" ? KA.src : background.src;
 
   return (
     <>
-      {/* MUSIC PROMPT */}
+      {/* MUSIC PROMPT (đã đồng bộ class name với CSS) */}
       {showMusicPrompt && !isPlaying && (
         <div className={styles.musicOverlay}>
           <div className={styles.musicPopup}>
@@ -167,8 +198,11 @@ export default function CheckinClient() {
         {/* FLOAT BUTTONS */}
         <div className={styles.fabWrap}>
           <button
-            className={`${styles.fabBtn} ${styles.musicBtn}`}
+            className={`${styles.musicBtn} ${
+              isPlaying ? styles.musicPlaying : ""
+            }`}
             onClick={toggleMusic}
+            aria-label="Bật / tắt nhạc"
           >
             <img
               src={(isPlaying ? iconsPause : iconsPlay).src}
@@ -181,7 +215,7 @@ export default function CheckinClient() {
             className={`${styles.fabBtn} ${styles.timelineBtn}`}
             onClick={() => setShowTimeline(true)}
           >
-            <img src={timeline.src} className={styles.timelineIcon} />
+            <img src={timeline.src} className={styles.timelineIcon} alt="" />
             Lịch trình
           </button>
 
@@ -189,10 +223,76 @@ export default function CheckinClient() {
             className={`${styles.fabBtn} ${styles.menuBtn}`}
             onClick={() => setShowMenu(true)}
           >
-            <img src={menu.src} className={styles.menuIcon} />
+            <img src={menu.src} className={styles.menuIcon} alt="" />
             Thực đơn
           </button>
         </div>
+
+        {/* TIMELINE - THIỆP */}
+        {showTimeline && (
+          <div
+            className={styles.inviteOverlay}
+            onClick={() => setShowTimeline(false)}
+          >
+            <div
+              className={styles.inviteCard}
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+            >
+              <button
+                className={styles.inviteClose}
+                onClick={() => setShowTimeline(false)}
+                aria-label="Đóng"
+                title="Đóng"
+              >
+                ✕
+              </button>
+
+              <div className={styles.inviteTop}>
+                <img className={styles.inviteLogo} src={logo.src} alt="logo" />
+                <div className={styles.inviteTopText}>
+                  <div className={styles.inviteTitle}>LỊCH TRÌNH</div>
+                  <div className={styles.inviteName}>{eventInfo.name}</div>
+                  <div className={styles.inviteOrg}>{eventInfo.org}</div>
+                </div>
+              </div>
+
+              <div className={styles.inviteMeta}>
+                <div className={styles.inviteMetaRow}>
+                  <span className={styles.inviteMetaLabel}>Thời gian</span>
+                  <span className={styles.inviteMetaValue}>
+                    {eventInfo.time}
+                  </span>
+                </div>
+                <div className={styles.inviteDivider} />
+                <div className={styles.inviteMetaRow}>
+                  <span className={styles.inviteMetaLabel}>Địa điểm</span>
+                  <span className={styles.inviteMetaValue}>
+                    {eventInfo.place}
+                  </span>
+                </div>
+              </div>
+
+              <div className={styles.inviteTimeline}>
+                {timelineItems.map((it, idx) => (
+                  <div key={idx} className={styles.inviteItem}>
+                    <div className={styles.inviteTime}>{it.time}</div>
+                    <div className={styles.inviteDot} />
+                    <div className={styles.inviteBody}>
+                      <div className={styles.inviteItemTitle}>{it.title}</div>
+                      <div className={styles.inviteItemDesc}>{it.desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* <div className={styles.inviteHint}>
+                Chạm ra ngoài để đóng • bấm ESC để thoát
+              </div> */}
+            </div>
+          </div>
+        )}
 
         <MenuFlipbook
           open={showMenu}

@@ -14,6 +14,7 @@ import comduongchau from "./assests/menu/comduongchau.webp";
 import cachem from "./assests/menu/cachem.jpg";
 import lauthai from "./assests/menu/lauthai.jpg";
 import raucau from "./assests/menu/raucau.jpg";
+import logo from "./assests/img/logo.png";
 
 import menu from "./assests/img/menu.png";
 import timeline from "./assests/img/timeline.png";
@@ -52,10 +53,24 @@ export default function HomePage() {
     []
   );
 
+  // ===== THÔNG TIN SỰ KIỆN (đúng theo bạn) =====
+  const eventInfo = useMemo(
+    () => ({
+      name: "TIỆC TẤT NIÊN",
+      org: "CÔNG TY CỔ PHẦN CÔNG NGHỆ TIỆN ÍCH THÔNG MINH",
+      time: "18h ngày 27/01/2026",
+      place:
+        "110-112 Đ. Vành Đai Trong, An Lạc A, Bình Tân, Thành phố Hồ Chí Minh",
+    }),
+    []
+  );
+
+  // ===== TIMELINE (chỉ 2 mốc - bạn thêm sau) =====
   const timelineItems = useMemo(
     () => [
-      { time: "18:00", title: "Mời khách", desc: "Đón khách – Check-in" },
-      { time: "18:45", title: "Khai tiệc", desc: "Bắt đầu chương trình" },
+      { time: "18g00", title: "Mời khách", desc: "Đón khách – Check-in" },
+      { time: "18g45", title: "Khai tiệc", desc: "Bắt đầu chương trình" },
+      // Sau này bạn thêm tiếp ở đây
     ],
     []
   );
@@ -96,7 +111,7 @@ export default function HomePage() {
     return () => clearTimeout(t);
   }, []);
 
-  // ESC đóng sheet
+  // ESC đóng timeline
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === "Escape") setShowTimeline(false);
@@ -138,30 +153,28 @@ export default function HomePage() {
           <div className={styles.bgOverlay} />
         </div>
 
-
         {/* RIGHT ACTIONS */}
         <div className={styles.fabWrap}>
           {/* MUSIC BUTTON */}
-        
-         <button
-  className={`${styles.musicBtn} ${isPlaying ? styles.musicPlaying : ""}`}
-  onClick={toggleMusic}
-  aria-label="Bật / tắt nhạc"
->
-
-          <img
-  src={(isPlaying ? iconsPause : iconsPlay).src}
-  alt="music"
-  className={styles.musicIcon}
-/>
-
+          <button
+            className={`${styles.musicBtn} ${
+              isPlaying ? styles.musicPlaying : ""
+            }`}
+            onClick={toggleMusic}
+            aria-label="Bật / tắt nhạc"
+          >
+            <img
+              src={(isPlaying ? iconsPause : iconsPlay).src}
+              alt="music"
+              className={styles.musicIcon}
+            />
           </button>
 
           <button
             className={`${styles.fabBtn} ${styles.timelineBtn}`}
             onClick={() => setShowTimeline(true)}
           >
-            <img src={timeline.src} className={styles.timelineIcon} />
+            <img src={timeline.src} className={styles.timelineIcon} alt="" />
             Lịch trình
           </button>
 
@@ -170,20 +183,69 @@ export default function HomePage() {
             onClick={() => setShowMenu(true)}
           >
             <span className={styles.menuIconWrap}>
-              <img className={styles.menuIcon} src={menu.src} />
+              <img className={styles.menuIcon} src={menu.src} alt="" />
             </span>
             Thực đơn
           </button>
         </div>
 
-        {/* TIMELINE */}
+        {/* TIMELINE - STYLE THIỆP */}
         {showTimeline && (
           <div
-            className={styles.sheetOverlay}
+            className={styles.inviteOverlay}
             onClick={() => setShowTimeline(false)}
           >
-            <div className={styles.sheet} onClick={(e) => e.stopPropagation()}>
-              {/* giữ nguyên phần này */}
+            <div
+              className={styles.inviteCard}
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+            >
+              <button
+                className={styles.inviteClose}
+                onClick={() => setShowTimeline(false)}
+                aria-label="Đóng"
+                title="Đóng"
+              >
+                ✕
+              </button>
+
+              {/* Header giống thiệp */}
+              <div className={styles.inviteTop}>
+                <img className={styles.inviteLogo} src={logo.src} alt="logo" />
+                <div className={styles.inviteTopText}>
+                  <div className={styles.inviteTitle}>LỊCH TRÌNH</div>
+                  <div className={styles.inviteName}>{eventInfo.name}</div>
+                  <div className={styles.inviteOrg}>{eventInfo.org}</div>
+                </div>
+              </div>
+
+              <div className={styles.inviteMeta}>
+                <div className={styles.inviteMetaRow}>
+                  <span className={styles.inviteMetaLabel}>Thời gian</span>
+                  <span className={styles.inviteMetaValue}>{eventInfo.time}</span>
+                </div>
+                <div className={styles.inviteDivider} />
+                <div className={styles.inviteMetaRow}>
+                  <span className={styles.inviteMetaLabel}>Địa điểm</span>
+                  <span className={styles.inviteMetaValue}>{eventInfo.place}</span>
+                </div>
+              </div>
+
+              {/* Timeline list */}
+              <div className={styles.inviteTimeline}>
+                {timelineItems.map((it, idx) => (
+                  <div key={idx} className={styles.inviteItem}>
+                    <div className={styles.inviteTime}>{it.time}</div>
+                    <div className={styles.inviteDot} />
+                    <div className={styles.inviteBody}>
+                      <div className={styles.inviteItemTitle}>{it.title}</div>
+                      <div className={styles.inviteItemDesc}>{it.desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+ 
             </div>
           </div>
         )}

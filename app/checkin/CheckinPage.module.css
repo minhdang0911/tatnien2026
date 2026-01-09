@@ -197,3 +197,274 @@
 .timelineIcon {
   width: 22px;
 }
+
+
+/* ===== MUSIC POPUP (đúng class JSX) ===== */
+.musicOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.musicPopup {
+  width: min(90%, 420px);
+  background: rgba(255,255,255,0.96);
+  border-radius: 18px;
+  padding: 18px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+}
+
+
+/* ================================
+   TIMELINE "THIỆP" (CENTER)
+   ================================ */
+
+.inviteOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+
+.inviteCard {
+  width: min(620px, 96vw);
+  max-height: min(82vh, 720px);
+  overflow: auto;
+  overscroll-behavior: contain;
+
+  position: relative;
+
+  background: linear-gradient(160deg, #0f3b4a 0%, #0a2f3b 55%, #082733 100%);
+  border-radius: 18px;
+
+  border: 2px solid rgba(212, 175, 55, 0.85);
+  box-shadow:
+    0 28px 80px rgba(0, 0, 0, 0.55),
+    inset 0 0 0 1px rgba(255, 226, 138, 0.18);
+
+  padding: 18px 18px 14px;
+
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(255, 226, 138, 0.10) 0%, transparent 38%),
+    radial-gradient(circle at 85% 30%, rgba(255, 226, 138, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 20% 85%, rgba(255, 226, 138, 0.06) 0%, transparent 45%),
+    linear-gradient(160deg, #0f3b4a 0%, #0a2f3b 55%, #082733 100%);
+}
+
+.inviteClose {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+
+  border: 1px solid rgba(255, 226, 138, 0.35);
+  background: rgba(0, 0, 0, 0.25);
+  color: rgba(255, 226, 138, 0.95);
+
+  cursor: pointer;
+  font-weight: 900;
+  font-size: 16px;
+
+  transition: transform .15s ease, background .15s ease;
+}
+.inviteClose:hover { transform: translateY(-1px); background: rgba(0, 0, 0, 0.32); }
+.inviteClose:active { transform: translateY(1px) scale(0.98); }
+
+.inviteTop {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-right: 48px;
+}
+
+.inviteTopText { min-width: 0; }
+
+.inviteTitle {
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: rgba(255, 226, 138, 0.95);
+  font-size: 13px;
+}
+
+.inviteName {
+  margin-top: 6px;
+  font-weight: 950;
+  font-size: 20px;
+  color: #ffffff;
+  line-height: 1.05;
+}
+
+.inviteOrg {
+  margin-top: 4px;
+  font-weight: 800;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.25;
+}
+
+/* meta box */
+.inviteMeta {
+  margin-top: 14px;
+  border-radius: 14px;
+  padding: 12px 12px;
+
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 226, 138, 0.26);
+}
+
+.inviteMetaRow {
+  display: grid;
+  grid-template-columns: 88px 1fr;
+  gap: 10px;
+  align-items: start;
+}
+
+.inviteMetaLabel {
+  font-weight: 900;
+  color: rgba(255, 226, 138, 0.95);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+
+.inviteMetaValue {
+  font-weight: 750;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.inviteDivider {
+  height: 1px;
+  margin: 10px 0;
+  background: rgba(255, 226, 138, 0.18);
+}
+
+/* timeline list */
+.inviteTimeline {
+  margin-top: 14px;
+  padding: 6px 6px 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.inviteItem {
+  display: grid;
+  grid-template-columns: 64px 18px 1fr;
+  gap: 10px;
+  align-items: start;
+}
+
+.inviteTime {
+  font-weight: 950;
+  color: rgba(255, 226, 138, 0.95);
+  font-size: 14px;
+  text-align: right;
+  padding-top: 6px;
+}
+
+.inviteDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  margin-top: 8px;
+
+  background: #d4af37;
+  box-shadow:
+    0 0 0 3px rgba(212, 175, 55, 0.20),
+    0 10px 24px rgba(0, 0, 0, 0.25);
+
+  position: relative;
+}
+
+/* line dọc */
+.inviteDot::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 14px;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 48px;
+  background: linear-gradient(
+    to bottom,
+    rgba(212, 175, 55, 0.55),
+    rgba(212, 175, 55, 0.05)
+  );
+  border-radius: 99px;
+}
+
+.inviteBody {
+  border-radius: 14px;
+  padding: 10px 12px;
+
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 226, 138, 0.18);
+}
+
+.inviteItemTitle {
+  font-weight: 950;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.inviteItemDesc {
+  margin-top: 4px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.inviteHint {
+  margin-top: 10px;
+  padding: 4px 4px 0;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* mobile */
+@media (max-width: 480px) {
+  .inviteCard {
+    padding: 16px 14px 12px;
+    border-radius: 16px;
+  }
+  .inviteName { font-size: 18px; }
+  .inviteMetaRow { grid-template-columns: 76px 1fr; }
+  .inviteItem { grid-template-columns: 58px 18px 1fr; }
+  .inviteTime { font-size: 13px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inviteClose { transition: none !important; }
+}
+
+.inviteLogo {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+  flex: 0 0 auto;
+
+  /* cho nổi trên nền thiệp */
+  filter: drop-shadow(0 8px 18px rgba(0,0,0,0.45));
+}

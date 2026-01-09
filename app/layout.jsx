@@ -1,5 +1,5 @@
 import './globals.css';
-export const metadata = { title: "QR Check-in" };
+export const metadata = { title: "Tất niên IKY 2026" };
 
 export default function RootLayout({ children }) {
   return (
