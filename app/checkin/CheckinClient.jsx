@@ -9,30 +9,24 @@ import backgroundtet from "../assests/img/tet6.gif";
 
 import MenuFlipbook from "../components/MenuFlipbook";
 
-// dishes
-import goitommuc from "../assests/menu/goitommuc.jpg";
-import soup from "../assests/menu/soup.jpg";
-import gaboxoi from "../assests/menu/gaboxoi.jpg";
-import comduongchau from "../assests/menu/comduongchau.webp";
-import cachem from "../assests/menu/cachem.jpg";
-import lauthai from "../assests/menu/lauthai.jpg";
-import raucau from "../assests/menu/raucau.jpg";
+// logo
 import logo from "../assests/img/logo.png";
 
 // icons
 import menu from "../assests/img/menu.png";
 import timeline from "../assests/img/timeline.png";
-import iconsPlay from "../assests/img/play.jpg";
-import iconsPause from "../assests/img/pause.jpg";
-
-// covers
-import bia from "../assests/menu/bia.png";
-import thankyou from "../assests/menu/thankyou.png";
-import biaket from "../assests/menu/ketbia.png";
+import iconsPlay from "../assests/img/volumestart.png";
+import iconsPause from "../assests/img/voloumestopp.png";
 
 // table bg
 import KA from "../assests/img/KA.jpg";
 import KM from "../assests/img/KM.jpg";
+
+// 4 trang menu
+import trangbia from "../assests/menu/trangbia.jpg";
+import thucdon from "../assests/menu/thucdon.jpg";
+import trangcamon from "../assests/menu/trangcamon.jpg";
+import biaket from "../assests/menu/trangket.png";
 
 /* ================= TABLE POS ================= */
 const TABLE_POS = {
@@ -92,10 +86,7 @@ export default function CheckinClient() {
     const saved = localStorage.getItem("music_playing");
     if (saved === "0") return;
 
-    const t = setTimeout(() => {
-      setShowMusicPrompt(true);
-    }, 2500);
-
+    const t = setTimeout(() => setShowMusicPrompt(true), 2500);
     return () => clearTimeout(t);
   }, []);
 
@@ -121,24 +112,18 @@ export default function CheckinClient() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  /* ===== MENU DATA ===== */
+  /* ===== MENU DATA (4 TRANG) ===== */
   const pages = useMemo(
     () => [
-      { type: "image", fullImg: bia.src },
-      { title: "Gỏi tôm mực Thái", img: goitommuc.src },
-      { title: "Soup hải sản", img: soup.src },
-      { title: "Cá chẽm sốt cam", img: cachem.src },
-      { title: "Gà bó xôi", img: gaboxoi.src },
-      { title: "Cơm dương châu", img: comduongchau.src },
-      { title: "Lẩu Thái hải sản", img: lauthai.src },
-      { title: "Rau câu", img: raucau.src },
-      { type: "image", fullImg: thankyou.src },
-      { type: "image", fullImg: biaket.src },
+      { type: "image", fullImg: trangbia.src }, // bìa trước
+      { type: "image", fullImg: thucdon.src }, // mở ra trang trái
+      { type: "image", fullImg: trangcamon.src }, // mở ra trang phải
+      { type: "image", fullImg: biaket.src }, // bìa kết
     ],
     []
   );
 
-  /* ===== EVENT INFO + TIMELINE (đúng theo bạn) ===== */
+  /* ===== EVENT INFO + TIMELINE ===== */
   const eventInfo = useMemo(
     () => ({
       name: "TIỆC TẤT NIÊN",
@@ -154,7 +139,6 @@ export default function CheckinClient() {
     () => [
       { time: "18g00", title: "Mời khách", desc: "Đón khách – Check-in" },
       { time: "18g45", title: "Khai tiệc", desc: "Bắt đầu chương trình" },
-      // sau này bạn thêm tiếp ở đây
     ],
     []
   );
@@ -164,7 +148,7 @@ export default function CheckinClient() {
 
   return (
     <>
-      {/* MUSIC PROMPT (đã đồng bộ class name với CSS) */}
+      {/* MUSIC PROMPT */}
       {showMusicPrompt && !isPlaying && (
         <div className={styles.musicOverlay}>
           <div className={styles.musicPopup}>
@@ -211,13 +195,13 @@ export default function CheckinClient() {
             />
           </button>
 
-          <button
+          {/* <button
             className={`${styles.fabBtn} ${styles.timelineBtn}`}
             onClick={() => setShowTimeline(true)}
           >
             <img src={timeline.src} className={styles.timelineIcon} alt="" />
             Lịch trình
-          </button>
+          </button> */}
 
           <button
             className={`${styles.fabBtn} ${styles.menuBtn}`}
@@ -228,7 +212,7 @@ export default function CheckinClient() {
           </button>
         </div>
 
-        {/* TIMELINE - THIỆP */}
+        {/* TIMELINE */}
         {showTimeline && (
           <div
             className={styles.inviteOverlay}
@@ -286,18 +270,16 @@ export default function CheckinClient() {
                   </div>
                 ))}
               </div>
-
-              {/* <div className={styles.inviteHint}>
-                Chạm ra ngoài để đóng • bấm ESC để thoát
-              </div> */}
             </div>
           </div>
         )}
 
+        {/* MENU FLIPBOOK */}
         <MenuFlipbook
           open={showMenu}
           onClose={() => setShowMenu(false)}
           pages={pages}
+          autoCloseLastMs={2000} // ✅ tới trang cuối, chờ 2s tự đóng
         />
       </div>
     </>

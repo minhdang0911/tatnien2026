@@ -8,48 +8,19 @@ import styles from "../menu.module.css";
 /* ================= PAGE ================= */
 
 const BookPage = React.forwardRef(function BookPage(props, ref) {
-  const { title, desc, img, type, fullImg } = props;
-
-  if (type === "image") {
-    return (
-      <div ref={ref} className={`${styles.page} ${styles.pageImage}`}>
-        <div className={styles.pageImgWrap}>
-          <Image
-            src={fullImg}
-            alt=""
-            fill
-            sizes="(max-width: 768px) 92vw, 520px"
-            style={{ objectFit: "cover" }}
-            priority
-          />
-        </div>
-      </div>
-    );
-  }
+  const { fullImg } = props;
 
   return (
-    <div ref={ref} className={styles.page}>
-      <div className={styles.pageInner}>
-        <div className={styles.left}>
-          <div className={styles.chip}>{desc}</div>
-          <div className={styles.dishTitle}>{title}</div>
-          <div className={styles.dishNote}>
-            Món được phục vụ theo set • Vui lòng liên hệ nhân viên nếu cần hỗ trợ
-          </div>
-          <div className={styles.divider} />
-        </div>
-
-        <div className={styles.right}>
-          <div className={styles.imgWrap}>
-            <Image
-              src={img}
-              alt={title || ""}
-              fill
-              sizes="(max-width: 768px) 60vw, 260px"
-              style={{ objectFit: "cover" }}
-            />
-          </div>
-        </div>
+    <div ref={ref} className={`${styles.page} ${styles.pageImage}`}>
+      <div className={styles.pageImgWrap}>
+        <Image
+          src={fullImg}
+          alt=""
+          fill
+          sizes="(max-width: 768px) 92vw, 520px"
+          style={{ objectFit: "cover" }}
+          priority
+        />
       </div>
     </div>
   );
@@ -91,14 +62,12 @@ function useBookSize(open) {
 export default function MenuFlipbook(props) {
   const { open } = props;
   if (!open) return null;
-
-  // mỗi lần open=true => mount mới => state reset, khỏi setState trong effect
   return <MenuFlipbookInner key="menu-flipbook-open" {...props} />;
 }
 
 /* ================= INNER ================= */
 
-function MenuFlipbookInner({ open, onClose, pages, autoCloseLastMs = 3000 }) {
+function MenuFlipbookInner({ open, onClose, pages, autoCloseLastMs = 2000 }) {
   const bookRef = useRef(null);
   const closeTimerRef = useRef(null);
 
@@ -114,20 +83,27 @@ function MenuFlipbookInner({ open, onClose, pages, autoCloseLastMs = 3000 }) {
     return "spread";
   }, [pageIndex, last]);
 
+  const clearCloseTimer = () => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  };
+
   const handleFlip = (e) => {
     const idx = e.data;
     setPageIndex(idx);
 
-    if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    clearCloseTimer();
+
+    // ✅ tới trang cuối thì tự đóng sau N ms
     if (idx === last && autoCloseLastMs > 0) {
       closeTimerRef.current = setTimeout(() => onClose?.(), autoCloseLastMs);
     }
   };
 
   useEffect(() => {
-    return () => {
-      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
-    };
+    return () => clearCloseTimer();
   }, []);
 
   return (
@@ -171,24 +147,28 @@ function MenuFlipbookInner({ open, onClose, pages, autoCloseLastMs = 3000 }) {
           ].join(" ")}
           style={{ "--pagew": `${pageW}px` }}
         >
-          <HTMLFlipBook
-            ref={bookRef}
-            width={pageW}
-            height={pageH}
-            size="fixed"
-            showCover
-            usePortrait={portrait}
-            maxShadowOpacity={0.35}
-            mobileScrollSupport
-            useMouseEvents
-            clickEventForward
-            startPage={0}
-            onFlip={handleFlip}
-          >
-            {pages.map((p, i) => (
-              <BookPage key={i} {...p} />
-            ))}
-          </HTMLFlipBook>
+          {/* ✅ wrap để translate mượt, tránh "nhảy center" khi đổi 1 trang <-> 2 trang */}
+          <div className={styles.bookWrap}>
+            <HTMLFlipBook
+              ref={bookRef}
+              width={pageW}
+              height={pageH}
+              size="fixed"
+              showCover
+              usePortrait={portrait}
+              maxShadowOpacity={0.35}
+              mobileScrollSupport
+              useMouseEvents
+              clickEventForward
+              startPage={0}
+              flippingTime={850} // ✅ mượt hơn
+              onFlip={handleFlip}
+            >
+              {pages.map((p, i) => (
+                <BookPage key={i} {...p} />
+              ))}
+            </HTMLFlipBook>
+          </div>
         </div>
       </div>
     </div>

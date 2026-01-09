@@ -6,25 +6,19 @@ import styles from "./HomePage.module.css";
 import background from "./assests/img/anhchinh.jpg";
 import backgroundtet from "./assests/img/tet6.gif";
 
-// dishes
-import goitommuc from "./assests/menu/goitommuc.jpg";
-import soup from "./assests/menu/soup.jpg";
-import gaboxoi from "./assests/menu/gaboxoi.jpg";
-import comduongchau from "./assests/menu/comduongchau.webp";
-import cachem from "./assests/menu/cachem.jpg";
-import lauthai from "./assests/menu/lauthai.jpg";
-import raucau from "./assests/menu/raucau.jpg";
 import logo from "./assests/img/logo.png";
 
+// icons
 import menu from "./assests/img/menu.png";
 import timeline from "./assests/img/timeline.png";
-import iconsPlay from "./assests/img/play.jpg";
-import iconsPause from "./assests/img/pause.jpg";
+import iconsPlay from "./assests/img/volumestart.png";
+import iconsPause from "./assests/img/voloumestopp.png";
 
-// covers
-import bia from "./assests/menu/bia.png";
-import thankyou from "./assests/menu/thankyou.png";
-import biaket from "./assests/menu/ketbia.png";
+// menu 4 trang (giống Checkin)
+import trangbia from "./assests/menu/trangbia.jpg";
+import thucdon from "./assests/menu/thucdon.jpg";
+import trangcamon from "./assests/menu/trangcamon.jpg";
+import biaket from "./assests/menu/trangket.png";
 
 import MenuFlipbook from "./components/MenuFlipbook";
 
@@ -32,28 +26,23 @@ export default function HomePage() {
   const [showMenu, setShowMenu] = useState(false);
   const [showTimeline, setShowTimeline] = useState(false);
 
-  // ===== MUSIC =====
+  /* ===== MUSIC ===== */
   const audioRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showMusicPrompt, setShowMusicPrompt] = useState(false);
 
+  /* ===== MENU DATA (4 TRANG) ===== */
   const pages = useMemo(
     () => [
-      { type: "image", fullImg: bia.src },
-      { title: "Gỏi tôm mực Thái", desc: "Khai vị", img: goitommuc.src },
-      { title: "Soup hải sản", desc: "Khai vị", img: soup.src },
-      { title: "Cá chẽm sốt cam", desc: "Món chính", img: cachem.src },
-      { title: "Gà bó xôi", desc: "Món chính", img: gaboxoi.src },
-      { title: "Cơm dương châu", desc: "Món chính", img: comduongchau.src },
-      { title: "Lẩu Thái hải sản", desc: "Món chính", img: lauthai.src },
-      { title: "Rau câu", desc: "Tráng miệng", img: raucau.src },
-      { type: "image", fullImg: thankyou.src },
+      { type: "image", fullImg: trangbia.src },
+      { type: "image", fullImg: thucdon.src },
+      { type: "image", fullImg: trangcamon.src },
       { type: "image", fullImg: biaket.src },
     ],
     []
   );
 
-  // ===== THÔNG TIN SỰ KIỆN (đúng theo bạn) =====
+  /* ===== EVENT INFO ===== */
   const eventInfo = useMemo(
     () => ({
       name: "TIỆC TẤT NIÊN",
@@ -65,12 +54,10 @@ export default function HomePage() {
     []
   );
 
-  // ===== TIMELINE (chỉ 2 mốc - bạn thêm sau) =====
   const timelineItems = useMemo(
     () => [
       { time: "18g00", title: "Mời khách", desc: "Đón khách – Check-in" },
       { time: "18g45", title: "Khai tiệc", desc: "Bắt đầu chương trình" },
-      // Sau này bạn thêm tiếp ở đây
     ],
     []
   );
@@ -99,19 +86,16 @@ export default function HomePage() {
     else await play();
   };
 
-  // popup hỏi nhạc sau 3s
+  /* popup hỏi nhạc */
   useEffect(() => {
     const saved = localStorage.getItem("music_playing");
     if (saved === "0") return;
 
-    const t = setTimeout(() => {
-      setShowMusicPrompt(true);
-    }, 3000);
-
+    const t = setTimeout(() => setShowMusicPrompt(true), 3000);
     return () => clearTimeout(t);
   }, []);
 
-  // ESC đóng timeline
+  /* ESC đóng timeline */
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === "Escape") setShowTimeline(false);
@@ -122,7 +106,7 @@ export default function HomePage() {
 
   return (
     <>
-      {/* POPUP MUSIC */}
+      {/* MUSIC PROMPT */}
       {showMusicPrompt && !isPlaying && (
         <div className={styles.musicOverlay}>
           <div className={styles.musicPopup}>
@@ -141,55 +125,53 @@ export default function HomePage() {
         </div>
       )}
 
+      <audio ref={audioRef} src="/media/music.mp3" loop preload="auto" />
+
       <div className={styles.root}>
         <div className={styles.tetBg}>
           <img className={styles.tetImg} src={backgroundtet.src} alt="tet" />
         </div>
-
-        <audio ref={audioRef} src="/media/music.mp3" loop preload="auto" />
 
         <div className={styles.bgWrap}>
           <img className={styles.bgImg} src={background.src} alt="bg" />
           <div className={styles.bgOverlay} />
         </div>
 
-        {/* RIGHT ACTIONS */}
+        {/* FLOAT BUTTONS */}
         <div className={styles.fabWrap}>
-          {/* MUSIC BUTTON */}
           <button
             className={`${styles.musicBtn} ${
               isPlaying ? styles.musicPlaying : ""
             }`}
             onClick={toggleMusic}
-            aria-label="Bật / tắt nhạc"
           >
             <img
               src={(isPlaying ? iconsPause : iconsPlay).src}
-              alt="music"
-              className={styles.musicIcon}
+              className={`${styles.musicIcon} ${
+                isPlaying ? styles.musicIconStop : styles.musicIconStart
+              }`}
+              alt=""
             />
           </button>
 
-          <button
+          {/* <button
             className={`${styles.fabBtn} ${styles.timelineBtn}`}
             onClick={() => setShowTimeline(true)}
           >
             <img src={timeline.src} className={styles.timelineIcon} alt="" />
             Lịch trình
-          </button>
+          </button> */}
 
           <button
             className={`${styles.fabBtn} ${styles.menuBtn}`}
             onClick={() => setShowMenu(true)}
           >
-            <span className={styles.menuIconWrap}>
-              <img className={styles.menuIcon} src={menu.src} alt="" />
-            </span>
+            <img src={menu.src} className={styles.menuIcon} alt="" />
             Thực đơn
           </button>
         </div>
 
-        {/* TIMELINE - STYLE THIỆP */}
+        {/* TIMELINE */}
         {showTimeline && (
           <div
             className={styles.inviteOverlay}
@@ -198,21 +180,16 @@ export default function HomePage() {
             <div
               className={styles.inviteCard}
               onClick={(e) => e.stopPropagation()}
-              role="dialog"
-              aria-modal="true"
             >
               <button
                 className={styles.inviteClose}
                 onClick={() => setShowTimeline(false)}
-                aria-label="Đóng"
-                title="Đóng"
               >
                 ✕
               </button>
 
-              {/* Header giống thiệp */}
               <div className={styles.inviteTop}>
-                <img className={styles.inviteLogo} src={logo.src} alt="logo" />
+                <img className={styles.inviteLogo} src={logo.src} alt="" />
                 <div className={styles.inviteTopText}>
                   <div className={styles.inviteTitle}>LỊCH TRÌNH</div>
                   <div className={styles.inviteName}>{eventInfo.name}</div>
@@ -222,39 +199,38 @@ export default function HomePage() {
 
               <div className={styles.inviteMeta}>
                 <div className={styles.inviteMetaRow}>
-                  <span className={styles.inviteMetaLabel}>Thời gian</span>
-                  <span className={styles.inviteMetaValue}>{eventInfo.time}</span>
+                  <span>Thời gian</span>
+                  <span>{eventInfo.time}</span>
                 </div>
                 <div className={styles.inviteDivider} />
                 <div className={styles.inviteMetaRow}>
-                  <span className={styles.inviteMetaLabel}>Địa điểm</span>
-                  <span className={styles.inviteMetaValue}>{eventInfo.place}</span>
+                  <span>Địa điểm</span>
+                  <span>{eventInfo.place}</span>
                 </div>
               </div>
 
-              {/* Timeline list */}
               <div className={styles.inviteTimeline}>
-                {timelineItems.map((it, idx) => (
-                  <div key={idx} className={styles.inviteItem}>
+                {timelineItems.map((it, i) => (
+                  <div key={i} className={styles.inviteItem}>
                     <div className={styles.inviteTime}>{it.time}</div>
                     <div className={styles.inviteDot} />
-                    <div className={styles.inviteBody}>
+                    <div>
                       <div className={styles.inviteItemTitle}>{it.title}</div>
                       <div className={styles.inviteItemDesc}>{it.desc}</div>
                     </div>
                   </div>
                 ))}
               </div>
- 
             </div>
           </div>
         )}
 
+        {/* MENU FLIPBOOK */}
         <MenuFlipbook
           open={showMenu}
           onClose={() => setShowMenu(false)}
           pages={pages}
-          autoCloseLastMs={3000}
+          autoCloseLastMs={2000}
         />
       </div>
     </>
