@@ -14,7 +14,7 @@ import logo from "../assests/img/logo.png";
 
 // icons
 import menu from "../assests/img/menu.png";
-import timeline from "../assests/img/timeline.png";
+// import timeline from "../assests/img/timeline.png";
 import iconsPlay from "../assests/img/volumestart.png";
 import iconsPause from "../assests/img/voloumestopp.png";
 
@@ -30,8 +30,8 @@ import biaket from "../assests/menu/trangket.png";
 
 /* ================= TABLE POS ================= */
 const TABLE_POS = {
-  KM: { x: 0.684, y: 0.2 },
-  KA: { x: 0.808, y: 0.3 },
+  KM: { x: 0.6, y: 0.25 },
+  KA: { x: 0.6, y: 0.35 },
 };
 
 const TABLE_INFO = {
@@ -179,6 +179,29 @@ export default function CheckinClient() {
           <div className={styles.bgOverlay} />
         </div>
 
+        {/* ✅ TABLE PANEL (CÁI BẠN ĐANG TÌM) */}
+   {posNorm && tableLabel && (
+  <div
+    className={styles.tablePanel}
+    style={{
+      left: `${posNorm.x * 100}%`,
+      top: `${posNorm.y * 100}%`,
+    }}
+  >
+    <div className={styles.tableHello}>
+      Trân trọng kính mời!
+    </div>
+
+    <div className={styles.tableLine}>
+      Bàn của bạn: <b>{tableLabel}</b>
+      {tableCode ? (
+        <span className={styles.tableCode}>  </span>
+      ) : null}
+    </div>
+  </div>
+)}
+
+
         {/* FLOAT BUTTONS */}
         <div className={styles.fabWrap}>
           <button
@@ -279,7 +302,7 @@ export default function CheckinClient() {
           open={showMenu}
           onClose={() => setShowMenu(false)}
           pages={pages}
-          autoCloseLastMs={2000} // ✅ tới trang cuối, chờ 2s tự đóng
+          autoCloseLastMs={2000}
         />
       </div>
     </>

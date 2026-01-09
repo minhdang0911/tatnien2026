@@ -1,162 +1,30 @@
 .root {
-  min-height: 100dvh;      
+  min-height: 100dvh;
   height: 100dvh;
   position: relative;
   overflow: hidden;
   background: #8b1a1f;
 }
 
-/* ===== MUSIC PROMPT ===== */
-.musicPrompt {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0,0,0,0.35);
-}
+/* ✅ PANEL HIỂN THỊ BÀN */
+.tablePanel {
+  position: absolute;
+  z-index: 20;
+  transform: translate(-50%, -50%);
+  padding: 10px 14px;
+  border-radius: 14px;
 
-.musicBox {
-  background: rgba(255,255,255,0.95);
-  border-radius: 16px;
-  padding: 16px 18px;
-  width: min(320px, 90%);
-  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
-}
-
-.musicTitle {
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
   font-weight: 900;
-  margin-bottom: 12px;
-}
+  font-size: 14px;
+  letter-spacing: 0.02em;
 
-.musicActions {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-}
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 
-.musicYes {
-  background: #d81b60;
-  color: white;
-  border: none;
-  border-radius: 12px;
-  padding: 10px 18px;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.musicNo {
-  background: rgba(0,0,0,0.08);
-  border: none;
-  border-radius: 12px;
-  padding: 10px 18px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-
-
- /* ===============================
-   MUSIC BUTTON (FIX XẤU)
-   =============================== */
-
-.musicBtn {
-  width: 48px;
-  height: 48px;
-  border-radius: 999px;
-  border: none;
-  cursor: pointer;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: black;
-  box-shadow:
-    0 8px 20px rgba(0,0,0,0.35),
-    inset 0 1px 0 rgba(255,255,255,0.6);
-
-  transition: transform .15s ease, box-shadow .15s ease;
-}
-
-.musicBtn:hover {
-  transform: translateY(-1px);
-}
-
-.musicBtn:active {
-  transform: translateY(1px) scale(0.96);
-}
-
-.musicIcon {
-  width: 20px;
-  height: 20px;
-  object-fit: contain;
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.35));
-}
-
-/* ===== ĐANG PHÁT → PULSE ===== */
-.musicPlaying {
-  animation: musicPulse 1.8s ease-out infinite;
-}
-
-@keyframes musicPulse {
-  0% {
-    box-shadow:
-      0 0 0 0 rgba(216, 27, 96, 0.45),
-      0 8px 20px rgba(0,0,0,0.35);
-  }
-  70% {
-    box-shadow:
-      0 0 0 16px rgba(216, 27, 96, 0),
-      0 8px 20px rgba(0,0,0,0.35);
-  }
-  100% {
-    box-shadow:
-      0 0 0 0 rgba(216, 27, 96, 0),
-      0 8px 20px rgba(0,0,0,0.35);
-  }
-}
-
-
-/* ===== MUSIC BUTTON ===== */
-.musicBtn {
-  width: 56px;              /* nút to hơn để chứa icon 42px */
-  height: 56px;
-  border-radius: 999px;
-  border: none;
-  cursor: pointer;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: black;
-  box-shadow:
-    0 8px 20px rgba(0,0,0,0.35),
-    inset 0 1px 0 rgba(255,255,255,0.6);
-
-  transition: transform .15s ease, box-shadow .15s ease;
-}
-
-.musicBtn:hover { transform: translateY(-1px); }
-.musicBtn:active { transform: translateY(1px) scale(0.96); }
-
-/* icon mặc định = start/play */
-.musicIcon {
-  width: 22px;
-  height: 22px;
-  object-fit: contain;
-  display: block;
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.35));
-}
-
-/* ✅ khi đang phát (isPlaying=true) -> icon pause/stop to 42px */
-.musicPlaying .musicIcon {
-  width: 35px;
-  height: 35px;
-  /* nếu icon trắng mà bị tối do shadow thì bỏ filter */
-  /* filter: none; */
+  pointer-events: none;
 }
 
 /* ===== BACKGROUND ===== */
@@ -185,7 +53,7 @@
 .bgOverlay {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle, rgba(0,0,0,0.1), rgba(0,0,0,0.4));
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.4));
 }
 
 /* ===== FLOAT BTNS ===== */
@@ -208,15 +76,15 @@
   font-weight: 900;
   border: none;
   cursor: pointer;
-  box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
 }
 
 .timelineBtn {
-  background: rgba(255,255,255,0.92);
+  background: rgba(255, 255, 255, 0.92);
 }
 
 .menuBtn {
-  background: linear-gradient(135deg,#ffe28a,#d4af37);
+  background: linear-gradient(135deg, #ffe28a, #d4af37);
 }
 
 .menuIcon {
@@ -227,13 +95,72 @@
   width: 22px;
 }
 
+/* ===============================
+   MUSIC BUTTON (CHỈ GIỮ 1 BẢN)
+   =============================== */
+
+.musicBtn {
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: black;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.musicBtn:hover {
+  transform: translateY(-1px);
+}
+.musicBtn:active {
+  transform: translateY(1px) scale(0.96);
+}
+
+.musicIcon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
+}
+
+/* ===== ĐANG PHÁT → PULSE ===== */
+.musicPlaying {
+  animation: musicPulse 1.8s ease-out infinite;
+}
+
+/* khi đang phát -> icon to hơn */
+.musicPlaying .musicIcon {
+  width: 35px;
+  height: 35px;
+}
+
+@keyframes musicPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(216, 27, 96, 0.45), 0 8px 20px rgba(0, 0, 0, 0.35);
+  }
+  70% {
+    box-shadow: 0 0 0 16px rgba(216, 27, 96, 0), 0 8px 20px rgba(0, 0, 0, 0.35);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(216, 27, 96, 0), 0 8px 20px rgba(0, 0, 0, 0.35);
+  }
+}
 
 /* ===== MUSIC POPUP (đúng class JSX) ===== */
 .musicOverlay {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
   display: flex;
@@ -243,13 +170,42 @@
 
 .musicPopup {
   width: min(90%, 420px);
-  background: rgba(255,255,255,0.96);
+  background: rgba(255, 255, 255, 0.96);
   border-radius: 18px;
   padding: 18px;
   text-align: center;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
 }
 
+.musicTitle {
+  font-weight: 900;
+  margin-bottom: 12px;
+}
+
+.musicActions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.musicYes {
+  background: #d81b60;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.musicNo {
+  background: rgba(0, 0, 0, 0.08);
+  border: none;
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
 
 /* ================================
    TIMELINE "THIỆP" (CENTER)
@@ -282,16 +238,26 @@
   border-radius: 18px;
 
   border: 2px solid rgba(212, 175, 55, 0.85);
-  box-shadow:
-    0 28px 80px rgba(0, 0, 0, 0.55),
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.55),
     inset 0 0 0 1px rgba(255, 226, 138, 0.18);
 
   padding: 18px 18px 14px;
 
-  background-image:
-    radial-gradient(circle at 15% 20%, rgba(255, 226, 138, 0.10) 0%, transparent 38%),
-    radial-gradient(circle at 85% 30%, rgba(255, 226, 138, 0.08) 0%, transparent 40%),
-    radial-gradient(circle at 20% 85%, rgba(255, 226, 138, 0.06) 0%, transparent 45%),
+  background-image: radial-gradient(
+      circle at 15% 20%,
+      rgba(255, 226, 138, 0.1) 0%,
+      transparent 38%
+    ),
+    radial-gradient(
+      circle at 85% 30%,
+      rgba(255, 226, 138, 0.08) 0%,
+      transparent 40%
+    ),
+    radial-gradient(
+      circle at 20% 85%,
+      rgba(255, 226, 138, 0.06) 0%,
+      transparent 45%
+    ),
     linear-gradient(160deg, #0f3b4a 0%, #0a2f3b 55%, #082733 100%);
 }
 
@@ -312,10 +278,15 @@
   font-weight: 900;
   font-size: 16px;
 
-  transition: transform .15s ease, background .15s ease;
+  transition: transform 0.15s ease, background 0.15s ease;
 }
-.inviteClose:hover { transform: translateY(-1px); background: rgba(0, 0, 0, 0.32); }
-.inviteClose:active { transform: translateY(1px) scale(0.98); }
+.inviteClose:hover {
+  transform: translateY(-1px);
+  background: rgba(0, 0, 0, 0.32);
+}
+.inviteClose:active {
+  transform: translateY(1px) scale(0.98);
+}
 
 .inviteTop {
   display: flex;
@@ -324,7 +295,9 @@
   padding-right: 48px;
 }
 
-.inviteTopText { min-width: 0; }
+.inviteTopText {
+  min-width: 0;
+}
 
 .inviteTitle {
   font-weight: 900;
@@ -417,9 +390,7 @@
   margin-top: 8px;
 
   background: #d4af37;
-  box-shadow:
-    0 0 0 3px rgba(212, 175, 55, 0.20),
-    0 10px 24px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2), 0 10px 24px rgba(0, 0, 0, 0.25);
 
   position: relative;
 }
@@ -463,29 +434,30 @@
   line-height: 1.25;
 }
 
-.inviteHint {
-  margin-top: 10px;
-  padding: 4px 4px 0;
-  text-align: center;
-  font-size: 12px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.55);
-}
-
 /* mobile */
 @media (max-width: 480px) {
   .inviteCard {
     padding: 16px 14px 12px;
     border-radius: 16px;
   }
-  .inviteName { font-size: 18px; }
-  .inviteMetaRow { grid-template-columns: 76px 1fr; }
-  .inviteItem { grid-template-columns: 58px 18px 1fr; }
-  .inviteTime { font-size: 13px; }
+  .inviteName {
+    font-size: 18px;
+  }
+  .inviteMetaRow {
+    grid-template-columns: 76px 1fr;
+  }
+  .inviteItem {
+    grid-template-columns: 58px 18px 1fr;
+  }
+  .inviteTime {
+    font-size: 13px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .inviteClose { transition: none !important; }
+  .inviteClose {
+    transition: none !important;
+  }
 }
 
 .inviteLogo {
@@ -493,7 +465,24 @@
   height: 54px;
   object-fit: contain;
   flex: 0 0 auto;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.45));
+}
 
-  /* cho nổi trên nền thiệp */
-  filter: drop-shadow(0 8px 18px rgba(0,0,0,0.45));
+
+.tableHello{
+  font-weight: 950;
+  font-size: 13px;
+  margin-bottom: 4px;
+  opacity: 0.95;
+}
+
+.tableLine{
+  font-weight: 800;
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.tableCode{
+  opacity: 0.85;
+  font-weight: 900;
 }
